@@ -1,0 +1,1 @@
+# squeak-sbt-assigments
