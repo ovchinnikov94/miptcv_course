@@ -6,32 +6,33 @@ import numpy as np
 
 
 def autocontrast(src_path, dst_path, white_perc, black_perc):
-    img = cv2.imread(src_path)
-    #cv2.imshow("start", img)
-    b,g,r = cv2.split(img)
-    maxB, maxG, maxR, minB, minG, minR = np.max(b), np.max(g), np.max(r), np.min(b), np.min(g), np.min(r)
-    b[b > maxB - maxB * float(white_perc)] = 255;
-    b[b <= minB + float(black_perc) * (maxB - minB)] = 0
+    img = cv2.imread(src_path, 0)
 
-    g[g > maxG - maxG * float(white_perc)] = 255
-    g[g <= minG + float(black_perc) * (maxG - minG)] = 0
+    '''Make the most white_perc% bright pixels to be 255 and the most black_perc% dark pixels to be 0'''
+    max_value, min_value = np.max(img), np.min(img)
+    width, height = img.shape
+    hist = cv2.calcHist([img], [0], None, [256], [0, 256]).ravel()
+    '''Find high boundary'''
+    high_bound = max_value
+    while float(white_perc) * width * height > np.sum(hist[high_bound:]):
+        high_bound -= 1
+    '''Find low boundary'''
+    low_bound = min_value
+    while float(black_perc) * width * height > np.sum(hist[:low_bound]):
+        low_bound += 1
 
-    r[r > maxR - maxR * float(white_perc)] = 255
-    r[r <= minR + float(black_perc) * (maxR - minR)] = 0
+    img[img >= high_bound] = 255
+    img[img <= low_bound] = 0
 
-    b -= minB
-    g -= minG
-    r -= minR
-    b *= np.uint8(255.0 / (maxB - minB))
-    g *= np.uint8(255.0 / (maxG - minG))
-    r *= np.uint8(255.0 / (maxR - minR))
+    '''Do autocontrast'''
+    result = img.astype(float)
+    result -= min_value
+    result *= 255.0 / (max_value - min_value)
+    result[result > 255] = 255
+    result[result < 0] = 0
+    result = result.astype('uint8')
 
-    result = cv2.merge((b, g, r))
-    result.astype(np.uint8)
-    #cv2.imshow("result", result)
-    #cv2.waitKey(0)
-    #cv2.destroyAllWindows()
-    cv2.imwrite(dst_path, result)
+    cv2.imwrite(dst_path, np.hstack([result]))
 
 
 if __name__ == '__main__':
