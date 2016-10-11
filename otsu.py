@@ -13,20 +13,25 @@ def otsu(src_path, dst_path):
 
     indexes = np.arange(256)
 
-    g_min = np.inf
+    g_max = 0
     thresh = -1
     for i in range(1, 256):
         p0, p1 = np.hsplit(hist, [i])
         w0, w1 = hist_cumsum[i], hist_cumsum[255] - hist_cumsum[i]
         ind0, ind1 = np.hsplit(indexes, [i])
+        if w0 != 0:
+            m0 = np.sum(p0 * ind0) / w0
+        else:
+            m0 = 0
+        if w1 != 0:
+            m1 = np.sum(p1 * ind1) / w1
+        else:
+            m1 = 0
 
-        m0, m1 = np.sum(p0 * ind0) / w0, np.sum(p1 * ind1) / w1
-        g0, g1 = np.sum(((ind0 - m0) ** 2) * p0) / w0, np.sum(((ind1 - m1) ** 2) * p1) / w1
+        g_between = w0 * w1 * (np.sum((m1 - m0) ** 2))
 
-        gt = g0 * w0 + g1 * w1
-
-        if gt < g_min:
-            g_min = gt
+        if g_between > g_max:
+            g_max = g_between
             thresh = i
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
