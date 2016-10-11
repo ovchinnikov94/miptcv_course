@@ -11,10 +11,10 @@ def box_filter(src_path, dst_path, w, h):
     integral_sum = cv2.integral(img)
     for i in range(width):
         for j in range(height):
-            w1 = i + w % 2 - w / 2 if (i + w % 2 - w / 2 > -1) else 0
-            h1 = j + h % 2 - h / 2 if (j + h % 2 - h / 2 > -1) else 0
-            w2 = i + w % 2 + w / 2 if (i + w % 2 + w / 2 < width) else width
-            h2 = j + h % 2 + h / 2 if (j + h % 2 + h / 2 < height) else height
+            w1 = max(i + w % 2 - w / 2, 0)
+            h1 = max(j + h % 2 - h / 2, 0)
+            w2 = min(i + w % 2 + w / 2, width - 1)
+            h2 = min(j + h % 2 + h / 2, height - 1)
             cur_sum = integral_sum[w1][h1] + integral_sum[w2][h2] - integral_sum[w1][h2] - integral_sum[w2][h1]
             filter_size = (w2 - w1) * (h2 - h1)
             img.itemset((i, j, 0), np.uint8(float(cur_sum[0]) / filter_size))
