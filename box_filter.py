@@ -13,8 +13,8 @@ def box_filter(src_path, dst_path, w, h):
         for j in range(height):
             w1 = max(i + w % 2 - w / 2, 0)
             h1 = max(j + h % 2 - h / 2, 0)
-            w2 = min(i + w % 2 + w / 2, width - 1)
-            h2 = min(j + h % 2 + h / 2, height - 1)
+            w2 = min(i + w % 2 + w / 2, width)
+            h2 = min(j + h % 2 + h / 2, height)
             cur_sum = integral_sum[w1][h1] + integral_sum[w2][h2] - integral_sum[w1][h2] - integral_sum[w2][h1]
             filter_size = (w2 - w1) * (h2 - h1)
             img.itemset((i, j, 0), np.uint8(float(cur_sum[0]) / filter_size))
