@@ -13,7 +13,6 @@ def gradient_img(img):
 
 
 def hough_transform(img, theta, rho):
-    img = cv2.resize(img, None, fx=0.2, fy=0.2)
     img /= np.max(img)
     thetas = np.arange(-np.pi/2, np.pi/2, theta)
     width, height = img.shape
